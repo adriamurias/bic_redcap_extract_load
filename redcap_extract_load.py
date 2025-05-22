@@ -25,6 +25,8 @@ metadata = requests.post(database_url,data=metadata_request)
 metadata = pd.read_csv(StringIO(metadata.text))
 # Obtain list with all form names
 form_names = metadata.form_name.unique().tolist()
+# Obtain first field_name of the REDCap project which corresponds to the key variable that we need in all DFs/tables to identify patients
+id_field_name = metadata.loc[0,'field_name']
 
 # Form-Event Mappings
 formEventMapping_request = {
@@ -63,6 +65,7 @@ for form_name in form_names:
         'format': 'csv',
         'type': 'flat',
         'csvDelimiter': '',
+        'fields[0]': id_field_name, # we need to add the patient ID to the call in order to preserve the patient identifyier in all forms (by default, only included in 'screening')
         'rawOrLabel': 'label',
         'rawOrLabelHeaders': 'raw',
         'exportCheckboxLabel': 'false',
@@ -108,25 +111,9 @@ connection_string = (
 engine = create_engine(connection_string)
 
 # Save DFs to database
-for this_form_name in form_names:
-    
-    this_df = locals().get(this_form_name)
-    
-    this_df.to_sql('breast_redcap_'+this_form_name,
-                         con=engine, #sqlalchemy.engine.(Engine or Connection) or sqlite3.Connection
-                        #  schema='raw',
-                         if_exists='replace', #merge (update, insert, delete)
-                         index=False)
-
-
 for form_name, df in redcap_data_dict.items():
     
-    if not isinstance(df, pd.DataFrame):
-        print(f"Skipping non DataFrame object: {form_name}")
-        continue
-    
     df.to_sql('breast_redcap_' + form_name,
-              con=engine, #sqlalchemy.engine.(Engine or Connection) or sqlite3.Connection
-              #  schema='raw',
+              con=engine, #sqlalchemy engine
               if_exists='replace', #merge (update, insert, delete)
               index=False)
