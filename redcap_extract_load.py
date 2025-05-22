@@ -65,7 +65,7 @@ for form_name in form_names:
         'format': 'csv',
         'type': 'flat',
         'csvDelimiter': '',
-        'fields[0]': id_field_name, # we need to add the patient ID to the call in order to preserve the patient identifyier in all forms (by default, only included in 'screening')
+        'fields[0]': id_field_name, # we need to add the patient ID to the call in order to preserve the patient identifyier in all forms (by default, only included in the API call of the form containing this variable)
         'rawOrLabel': 'label',
         'rawOrLabelHeaders': 'raw',
         'exportCheckboxLabel': 'false',
