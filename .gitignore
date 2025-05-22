@@ -1,1 +1,2 @@
+# Files to avoid including in git version control
 /.env
